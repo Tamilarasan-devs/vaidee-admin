@@ -285,14 +285,13 @@ export default function AdminLayout() {
     { key: "admissions", label: "Admissions", icon: <Icon.Users /> },
     { key: "courseUpload", label: "Course Upload", icon: <Icon.Upload /> },
     { key: "recordedCourseUpload", label: "Recorded Upload", icon: <Icon.Upload /> },
-    { key: "users", label: "Users", icon: <Icon.Users /> },
+    
   ];
 
   const renderPage = () => {
     switch (activePage) {
       case "admissions": return <Admissions />;
       case "recordedCourseUpload": return <RecordedCourseUpload />;
-      case "users": return <Users />;
       case "courseUpload":
       default: return <CourseUpload />;
     }
