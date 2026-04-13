@@ -363,30 +363,7 @@ export default function AdminLayout() {
               ))}
             </ul>
           </div>
-
-          <div>
-            <p className="text-[10px] text-slate-600 font-bold uppercase tracking-widest px-3.5 mb-2">System</p>
-            <ul className="space-y-0.5">
-              <li className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl cursor-pointer text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-all">
-                <Icon.Settings /> Settings
-              </li>
-            </ul>
-          </div>
         </nav>
-
-        {/* User — pinned bottom */}
-        <div className="shrink-0 px-3 py-4 border-t border-white/5">
-          <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 cursor-pointer transition-colors">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-indigo-500 flex items-center justify-center text-white text-xs font-bold shrink-0 ring-2 ring-violet-500/30">
-              P
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-white truncate leading-tight">Priya Sharma</p>
-              <p className="text-[11px] text-slate-500 truncate">priya@admin.com</p>
-            </div>
-            <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-          </div>
-        </div>
       </aside>
 
       {/* ══ RIGHT SIDE — header fixed, content scrolls ══ */}
