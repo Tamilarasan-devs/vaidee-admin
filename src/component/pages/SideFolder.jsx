@@ -281,7 +281,7 @@ export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const nav = [
-    { key: "dashboard", label: "Dashboard", icon: <Icon.Dashboard /> },
+ 
     { key: "admissions", label: "Admissions", icon: <Icon.Users /> },
     { key: "courseUpload", label: "Course Upload", icon: <Icon.Upload /> },
     { key: "recordedCourseUpload", label: "Recorded Upload", icon: <Icon.Upload /> },
@@ -291,11 +291,10 @@ export default function AdminLayout() {
   const renderPage = () => {
     switch (activePage) {
       case "admissions": return <Admissions />;
-      case "courseUpload": return <CourseUpload />;
       case "recordedCourseUpload": return <RecordedCourseUpload />;
       case "users": return <Users />;
-      case "dashboard":
-      default: return <Dashboard />;
+      case "courseUpload":
+      default: return <CourseUpload />;
     }
   };
 

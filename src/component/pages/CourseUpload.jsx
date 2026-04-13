@@ -3,20 +3,20 @@ import axios from "axios";
 import BASE_URL from "../../apiConfig";
 export default function AdminPanel() {
   const [course, setCourse] = useState({
-    title: "Basic to Advanced Tailoring Class",
-    duration: "1 Month",
-    fees: "1500",
-    schedule: "Mon, Wed, Fri",
-    timing: "10AM - 8PM",
+    title: "",
+    duration: "",
+    fees: "",
+    schedule: "",
+    timing: "",
     description: "",
     eligibility:
-      "Anyone interested in learning tailoring, no prior experience required.",
+      "",
     training:
-      "Full hands-on training with experienced instructors covering all aspects of tailoring.",
+      "",
     tagLine:
-      "Limited seats available! Enroll now to secure your spot.",
+      "",
     payment:
-      "All payments via UPI, Bank Transfer, or Cash.",
+      "",
   });
 
   const handleChange = (e) => {
