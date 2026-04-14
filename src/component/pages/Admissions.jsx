@@ -185,6 +185,25 @@ export default function Admissions() {
                   <InfoItem label="College/School" value={selectedAdmission.college} />
                 </Section>
 
+                {/* Payment Screenshot */}
+                {selectedAdmission.paymentScreenshot && (
+                  <div className="md:col-span-1">
+                    <Section title="Payment Screenshot">
+                      <div 
+                        className="rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity"
+                        onClick={() => window.open(`${BASE_URL}/uploads/admissions/${selectedAdmission.paymentScreenshot}`, '_blank')}
+                      >
+                        <img 
+                          src={`${BASE_URL}/uploads/admissions/${selectedAdmission.paymentScreenshot}`} 
+                          alt="Payment Screenshot"
+                          className="max-h-48 w-full object-contain"
+                        />
+                      </div>
+                      <p className="text-[10px] text-slate-400 mt-2 text-center italic">Click image to view full size</p>
+                    </Section>
+                  </div>
+                )}
+
                 {/* Address */}
                 <div className="md:col-span-2">
                   <Section title="Full Address">

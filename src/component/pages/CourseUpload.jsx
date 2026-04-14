@@ -43,7 +43,6 @@ export default function AdminPanel() {
 
 try {
   const response = await axios.post(`${BASE_URL}/api/courses`, course);
-    console.log('response :',response.data);
     alert("Course Saved Successfully!");
     setCourse({ // Reset form
       title: "", duration: "", fees: "", schedule: "", timing: "",
@@ -73,8 +72,8 @@ try {
 
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6 flex justify-center items-start">
-      <div className="bg-white shadow-2xl rounded-2xl w-full max-w-3xl p-8">
+    <div className="min-h-screen bg-gray-100 p-4 md:p-10 flex flex-col lg:flex-row gap-8 items-center lg:items-start lg:justify-center">
+      <div className="bg-white shadow-2xl rounded-2xl w-full max-w-2xl p-6 md:p-10">
 
         {/* Header */}
         <h2 className="text-3xl font-bold text-[#0c4563] mb-2">
@@ -106,7 +105,7 @@ try {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">
                     Duration
@@ -142,7 +141,7 @@ try {
               Schedule Details
             </h3>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">
                   Class Days
@@ -254,7 +253,7 @@ try {
       </div>
 
       {/* Courses List */}
-      <div className="bg-white shadow-2xl rounded-2xl w-full max-w-xl p-8 sticky top-6">
+      <div className="bg-white shadow-2xl rounded-2xl w-full max-w-md p-6 md:p-8 lg:sticky lg:top-10">
         <h2 className="text-2xl font-bold text-[#0c4563] mb-4">Existing Courses</h2>
         <div className="space-y-4">
           {courses.length === 0 ? (
