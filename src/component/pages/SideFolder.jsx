@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Admissions from "./Admissions";
 import CourseUpload from "./CourseUpload";
 import RecordedCourseUpload from "./RecordedCourseUpload";
+import ImageUpload from "./ImageUpload";
+import AnnouncementUpload from "./AnnouncementUpload";
 
 // ── Icons ──────────────────────────────────────────────────────
 const Icon = {
@@ -285,6 +287,8 @@ export default function AdminLayout() {
     { key: "admissions", label: "Admissions", icon: <Icon.Users /> },
     { key: "courseUpload", label: "Course Upload", icon: <Icon.Upload /> },
     { key: "recordedCourseUpload", label: "Recorded Upload", icon: <Icon.Upload /> },
+    { key: "imageUpload", label: "Image Upload", icon: <Icon.Upload /> },
+    { key: "announcementUpload", label: "Announcements", icon: <Icon.Bell /> },
     
   ];
 
@@ -292,6 +296,8 @@ export default function AdminLayout() {
     switch (activePage) {
       case "admissions": return <Admissions />;
       case "recordedCourseUpload": return <RecordedCourseUpload />;
+      case "imageUpload": return <ImageUpload />;
+      case "announcementUpload": return <AnnouncementUpload />;
       case "courseUpload":
       default: return <CourseUpload />;
     }
