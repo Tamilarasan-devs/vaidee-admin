@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import BASE_URL from "../../apiConfig";
+import {
+  BookOpen,
+  Clock,
+  IndianRupee,
+  Calendar,
+  Search,
+  Trash2,
+  GraduationCap,
+  FileText,
+} from "lucide-react";
+
 export default function AdminPanel() {
   const [course, setCourse] = useState({
     title: "",
@@ -9,16 +20,16 @@ export default function AdminPanel() {
     schedule: "",
     timing: "",
     description: "",
-    eligibility:
-      "",
-    training:
-      "",
-    tagLine:
-      "",
-    payment:
-      "",
+    eligibility: "",
+    training: "",
+    tagLine: "",
+    payment: "",
   });
+
+  const [pdfFile, setPdfFile] = useState(null);
   const [courses, setCourses] = useState([]);
+  const [search, setSearch] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const fetchCourses = async () => {
     try {
@@ -36,251 +47,429 @@ export default function AdminPanel() {
   }, []);
 
   const handleChange = (e) => {
-    setCourse({ ...course, [e.target.name]: e.target.value });
+    setCourse({
+      ...course,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSave = async () => {
-
-try {
-  const response = await axios.post(`${BASE_URL}/api/courses`, course);
-    alert("Course Saved Successfully!");
-    setCourse({ // Reset form
-      title: "", duration: "", fees: "", schedule: "", timing: "",
-      description: "", eligibility: "", training: "", tagLine: "", payment: ""
-    });
-    fetchCourses();
-} catch (error) {
-  console.log(error)
-  alert("Failed to save course");
-}
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this course?")) return;
     try {
-      const { data } = await axios.delete(`${BASE_URL}/api/courses/${id}`);
-      if (data.success) {
-        alert("Course deleted successfully");
-        fetchCourses();
+      setSaving(true);
+
+      const formData = new FormData();
+      Object.keys(course).forEach((key) => {
+        formData.append(key, course[key]);
+      });
+      if (pdfFile) {
+        formData.append("pdf", pdfFile);
       }
-    } catch (err) {
-      console.error(err);
-      alert("Failed to delete course");
+
+      await axios.post(`${BASE_URL}/api/courses`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      alert("Course Saved Successfully!");
+
+      setCourse({
+        title: "",
+        duration: "",
+        fees: "",
+        schedule: "",
+        timing: "",
+        description: "",
+        eligibility: "",
+        training: "",
+        tagLine: "",
+        payment: "",
+      });
+      setPdfFile(null);
+      const fileInput = document.getElementById("course-pdf-input");
+      if (fileInput) fileInput.value = "";
+
+      fetchCourses();
+    } catch (error) {
+      console.log(error);
+      alert("Failed to save course");
+    } finally {
+      setSaving(false);
     }
   };
 
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this course?")) return;
 
+    try {
+      const { data } = await axios.delete(
+        `${BASE_URL}/api/courses/${id}`
+      );
+
+      if (data.success) {
+        fetchCourses();
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Delete failed");
+    }
+  };
+
+  const filteredCourses = courses.filter((item) =>
+    item.title.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-10 flex flex-col lg:flex-row gap-8 items-center lg:items-start lg:justify-center">
-      <div className="bg-white shadow-2xl rounded-2xl w-full max-w-2xl p-6 md:p-10">
+    <div className="min-h-screen bg-slate-50">
+      {/* HEADER */}
+      <div className="bg-gradient-to-r from-[#0c4563] via-[#146082] to-[#1d7ea8]">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold text-white">
+                Course Management
+              </h1>
 
-        {/* Header */}
-        <h2 className="text-3xl font-bold text-[#0c4563] mb-2">
-       Course   Upload & Management
-        </h2>
-        <p className="text-gray-500 mb-6">
-          Manage your tailoring course content
-        </p>
+              <p className="text-blue-100 mt-1">
+                Manage tailoring programs, schedules and fees.
+              </p>
+            </div>
 
-        <div className="space-y-6">
+            <div className="bg-white/10 backdrop-blur-md px-5 py-3 rounded-2xl border border-white/20">
+              <p className="text-blue-100 text-sm">
+                Total Courses
+              </p>
 
-          {/* Basic Info */}
-          <div>
-            <h3 className="text-lg font-semibold text-[#0c4563] mb-3">
-              Basic Information
-            </h3>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Course Title
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={course.title}
-                  onChange={handleChange}
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#0c4563] outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Duration
-                  </label>
-                  <input
-                    type="text"
-                    name="duration"
-                    value={course.duration}
-                    onChange={handleChange}
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#0c4563]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Fees (₹)
-                  </label>
-                  <input
-                    type="text"
-                    name="fees"
-                    value={course.fees}
-                    onChange={handleChange}
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#0c4563]"
-                  />
-                </div>
-              </div>
+              <h2 className="text-3xl font-bold text-white">
+                {courses.length}
+              </h2>
             </div>
           </div>
 
-          {/* Schedule */}
-          <div>
-            <h3 className="text-lg font-semibold text-[#0c4563] mb-3">
-              Schedule Details
-            </h3>
+          {/* Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+              <p className="text-blue-100 text-sm">
+                Courses
+              </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Class Days
-                </label>
-                <input
-                  type="text"
-                  name="schedule"
-                  value={course.schedule}
-                  onChange={handleChange}
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#0c4563]"
-                />
-              </div>
+              <h3 className="text-2xl font-bold text-white">
+                {courses.length}
+              </h3>
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Timing
-                </label>
-                <input
-                  type="text"
-                  name="timing"
-                  value={course.timing}
-                  onChange={handleChange}
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#0c4563]"
-                />
-              </div>
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+              <p className="text-blue-100 text-sm">
+                Training Programs
+              </p>
+
+              <h3 className="text-2xl font-bold text-white">
+                Active
+              </h3>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+              <p className="text-blue-100 text-sm">
+                Dashboard Access
+              </p>
+
+              <h3 className="text-2xl font-bold text-white">
+                Admin
+              </h3>
             </div>
           </div>
-
-          {/* Content Sections */}
-          <div>
-            <h3 className="text-lg font-semibold text-[#0c4563] mb-3">
-              Course Content
-            </h3>
-
-            <div className="space-y-4">
-
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Description
-                </label>
-                <textarea
-                  name="description"
-                  value={course.description}
-                  onChange={handleChange}
-                  className="w-full p-3 border rounded-lg h-24 focus:ring-2 focus:ring-[#0c4563]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Eligibility
-                </label>
-                <textarea
-                  name="eligibility"
-                  value={course.eligibility}
-                  onChange={handleChange}
-                  className="w-full p-3 border rounded-lg h-20 focus:ring-2 focus:ring-[#0c4563]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Training Details
-                </label>
-                <textarea
-                  name="training"
-                  value={course.training}
-                  onChange={handleChange}
-                  className="w-full p-3 border rounded-lg h-24 focus:ring-2 focus:ring-[#0c4563]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Tagline / Offer
-                </label>
-                <textarea
-                  name="tagLine"
-                  value={course.tagLine}
-                  onChange={handleChange}
-                  className="w-full p-3 border rounded-lg h-20 focus:ring-2 focus:ring-[#0c4563]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Payment Info
-                </label>
-                <textarea
-                  name="payment"
-                  value={course.payment}
-                  onChange={handleChange}
-                  className="w-full p-3 border rounded-lg h-20 focus:ring-2 focus:ring-[#0c4563]"
-                />
-              </div>
-
-            </div>
-          </div>
-
-          {/* Save Button */}
-          <button
-            onClick={handleSave}
-            className="w-full bg-[#0c4563] text-white py-3 rounded-lg font-semibold hover:opacity-90 transition"
-          >
-            Save Course Details
-          </button>
-
         </div>
       </div>
 
-      {/* Courses List */}
-      <div className="bg-white shadow-2xl rounded-2xl w-full max-w-md p-6 md:p-8 lg:sticky lg:top-10">
-        <h2 className="text-2xl font-bold text-[#0c4563] mb-4">Existing Courses</h2>
-        <div className="space-y-4">
-          {courses.length === 0 ? (
-            <p className="text-gray-400 italic text-center py-8">No courses found.</p>
-          ) : (
-            courses.map((c) => (
-              <div key={c._id} className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-between hover:border-[#0c4563] transition-all group">
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-bold text-[#0c4563] truncate">{c.title}</h3>
-                  <div className="flex gap-3 mt-1">
-                    <span className="text-[10px] text-gray-500 font-medium">₹{c.fees}</span>
-                    <span className="text-[10px] text-gray-500 font-medium">{c.duration}</span>
+      {/* BODY */}
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
+        <div className="grid lg:grid-cols-3 gap-6">
+
+          {/* FORM */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+
+              {/* Title */}
+              <div className="border-b border-slate-200 px-6 py-5">
+                <div className="flex items-center gap-3">
+                  <div className="bg-[#0c4563]/10 p-3 rounded-xl">
+                    <GraduationCap
+                      size={24}
+                      className="text-[#0c4563]"
+                    />
+                  </div>
+
+                  <div>
+                    <h2 className="font-bold text-xl text-slate-800">
+                      Add New Course
+                    </h2>
+
+                    <p className="text-slate-500 text-sm">
+                      Create professional course information.
+                    </p>
                   </div>
                 </div>
-                <button
-                  onClick={() => handleDelete(c._id)}
-                  className="p-2 text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
-                  title="Delete Course"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                    <line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line>
-                  </svg>
-                </button>
               </div>
-            ))
-          )}
+
+              <div className="p-6 space-y-6">
+
+                {/* BASIC INFO */}
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-4">
+                    Basic Information
+                  </h3>
+
+                  <div className="space-y-4">
+
+                    <input
+                      type="text"
+                      name="title"
+                      value={course.title}
+                      onChange={handleChange}
+                      placeholder="Enter course title"
+                      className="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0c4563] focus:border-transparent outline-none"
+                    />
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <input
+                        type="text"
+                        name="duration"
+                        value={course.duration}
+                        onChange={handleChange}
+                        placeholder="Duration (e.g. 3 Months)"
+                        className="w-full p-3 rounded-xl border border-slate-300"
+                      />
+
+                      <input
+                        type="text"
+                        name="fees"
+                        value={course.fees}
+                        onChange={handleChange}
+                        placeholder="Course Fees"
+                        className="w-full p-3 rounded-xl border border-slate-300"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* SCHEDULE */}
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-4">
+                    Schedule Details
+                  </h3>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      name="schedule"
+                      value={course.schedule}
+                      onChange={handleChange}
+                      placeholder="Mon - Fri"
+                      className="w-full p-3 rounded-xl border border-slate-300"
+                    />
+
+                    <input
+                      type="text"
+                      name="timing"
+                      value={course.timing}
+                      onChange={handleChange}
+                      placeholder="10 AM - 12 PM"
+                      className="w-full p-3 rounded-xl border border-slate-300"
+                    />
+                  </div>
+                </div>
+
+                {/* TEXTAREAS */}
+                <div className="grid gap-4">
+
+                  {[
+                    ["description", "Description"],
+                    ["eligibility", "Eligibility"],
+                    ["training", "Training Details"],
+                    ["tagLine", "Special Offer / Tagline"],
+                    ["payment", "Payment Information"],
+                  ].map(([name, label]) => (
+                    <div key={name}>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        {label}
+                      </label>
+
+                      <textarea
+                        name={name}
+                        value={course[name]}
+                        onChange={handleChange}
+                        rows={3}
+                        className="w-full p-3 rounded-xl border border-slate-300 resize-none"
+                        placeholder={`Enter ${label}`}
+                      />
+                    </div>
+                  ))}
+
+                </div>
+
+                {/* PDF UPLOAD */}
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-4">
+                    Course Material (PDF)
+                  </h3>
+
+                  <div className="relative">
+                    <input
+                      id="course-pdf-input"
+                      type="file"
+                      accept=".pdf"
+                      onChange={(e) => setPdfFile(e.target.files[0] || null)}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => document.getElementById("course-pdf-input").click()}
+                      className="w-full flex items-center gap-4 p-4 border-2 border-dashed border-slate-300 rounded-2xl hover:border-[#0c4563] hover:bg-[#0c4563]/5 transition-all cursor-pointer group"
+                    >
+                      <span className="flex items-center justify-center w-12 h-12 bg-[#0c4563]/10 rounded-xl text-[#0c4563] group-hover:bg-[#0c4563]/20 transition-colors">
+                        <FileText size={22} />
+                      </span>
+                      <span className="text-left flex-1">
+                        {pdfFile ? (
+                          <>
+                            <span className="block text-slate-800 font-semibold text-sm">{pdfFile.name}</span>
+                            <span className="block text-slate-400 text-xs mt-0.5">
+                              {(pdfFile.size / 1024 / 1024).toFixed(2)} MB · Click to change
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="block text-slate-500 font-medium text-sm">Click to upload a PDF file</span>
+                            <span className="block text-slate-400 text-xs mt-0.5">
+                              Syllabus, brochure, or course material (optional)
+                            </span>
+                          </>
+                        )}
+                      </span>
+                      {pdfFile && (
+                        <span
+                          className="text-xs text-red-500 hover:text-red-700 font-semibold px-3 py-1.5 rounded-lg hover:bg-red-50 transition-all border border-transparent hover:border-red-200"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPdfFile(null);
+                            const fileInput = document.getElementById("course-pdf-input");
+                            if (fileInput) fileInput.value = "";
+                          }}
+                        >
+                          Remove
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="w-full bg-gradient-to-r from-[#0c4563] to-[#1d7ea8] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+                >
+                  {saving ? "Saving Course..." : "Save Course"}
+                </button>
+
+              </div>
+            </div>
+          </div>
+
+          {/* COURSE LIST */}
+          <div>
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm sticky top-5">
+
+              <div className="border-b border-slate-200 p-5">
+                <h2 className="text-xl font-bold text-slate-800">
+                  Existing Courses
+                </h2>
+
+                <p className="text-sm text-slate-500">
+                  Search and manage courses
+                </p>
+              </div>
+
+              <div className="p-5">
+
+                <div className="relative mb-5">
+                  <Search
+                    size={18}
+                    className="absolute left-3 top-3.5 text-gray-400"
+                  />
+
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={search}
+                    onChange={(e) =>
+                      setSearch(e.target.value)
+                    }
+                    className="w-full pl-10 p-3 border rounded-xl"
+                  />
+                </div>
+
+                <div className="space-y-3 max-h-[650px] overflow-y-auto">
+
+                  {filteredCourses.length === 0 ? (
+                    <div className="text-center py-12">
+                      <Calendar
+                        size={50}
+                        className="mx-auto text-slate-300"
+                      />
+
+                      <p className="text-slate-400 mt-3">
+                        No courses found
+                      </p>
+                    </div>
+                  ) : (
+                    filteredCourses.map((c) => (
+                      <div
+                        key={c._id}
+                        className="group border border-slate-200 rounded-2xl p-4 hover:border-[#0c4563] hover:shadow-md transition-all"
+                      >
+                        <div className="flex justify-between items-start">
+
+                          <div>
+                            <h3 className="font-semibold text-slate-800">
+                              {c.title}
+                            </h3>
+
+                            <div className="flex flex-wrap gap-2 mt-3">
+                              <span className="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">
+                                ₹ {c.fees}
+                              </span>
+
+                              <span className="bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full">
+                                {c.duration}
+                              </span>
+
+                              {c.pdfUrl && (
+                                <span className="bg-violet-100 text-violet-700 text-xs px-3 py-1 rounded-full flex items-center gap-1">
+                                  <FileText size={11} />
+                                  PDF
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={() =>
+                              handleDelete(c._id)
+                            }
+                            className="text-red-500 opacity-0 group-hover:opacity-100 transition"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+
+                        </div>
+                      </div>
+                    ))
+                  )}
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
