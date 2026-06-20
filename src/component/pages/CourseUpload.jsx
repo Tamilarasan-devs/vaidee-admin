@@ -10,6 +10,7 @@ import {
   Trash2,
   GraduationCap,
   FileText,
+  Edit2,
 } from "lucide-react";
 
 export default function AdminPanel() {
@@ -24,12 +25,14 @@ export default function AdminPanel() {
     training: "",
     tagLine: "",
     payment: "",
+    pdfUrl: "",
   });
 
   const [pdfFile, setPdfFile] = useState(null);
   const [courses, setCourses] = useState([]);
   const [search, setSearch] = useState("");
   const [saving, setSaving] = useState(false);
+  const [editId, setEditId] = useState(null);
 
   const fetchCourses = async () => {
     try {
@@ -65,12 +68,19 @@ export default function AdminPanel() {
         formData.append("pdf", pdfFile);
       }
 
-      await axios.post(`${BASE_URL}/api/courses`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      if (editId) {
+        await axios.put(`${BASE_URL}/api/courses/${editId}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        alert("Course Updated Successfully!");
+      } else {
+        await axios.post(`${BASE_URL}/api/courses`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        alert("Course Saved Successfully!");
+      }
 
-      alert("Course Saved Successfully!");
-
+      setEditId(null);
       setCourse({
         title: "",
         duration: "",
@@ -82,6 +92,7 @@ export default function AdminPanel() {
         training: "",
         tagLine: "",
         payment: "",
+        pdfUrl: "",
       });
       setPdfFile(null);
       const fileInput = document.getElementById("course-pdf-input");
@@ -111,6 +122,27 @@ export default function AdminPanel() {
       console.log(error);
       alert("Delete failed");
     }
+  };
+
+  const handleEdit = (c) => {
+    setEditId(c._id);
+    setCourse({
+      title: c.title || "",
+      duration: c.duration || "",
+      fees: c.fees || "",
+      schedule: c.schedule || "",
+      timing: c.timing || "",
+      description: c.description || "",
+      eligibility: c.eligibility || "",
+      training: c.training || "",
+      tagLine: c.tagLine || "",
+      payment: c.payment || "",
+      pdfUrl: c.pdfUrl || "",
+    });
+    setPdfFile(null);
+    const fileInput = document.getElementById("course-pdf-input");
+    if (fileInput) fileInput.value = "";
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const filteredCourses = courses.filter((item) =>
@@ -199,11 +231,11 @@ export default function AdminPanel() {
 
                   <div>
                     <h2 className="font-bold text-xl text-slate-800">
-                      Add New Course
+                      {editId ? "Edit Course" : "Add New Course"}
                     </h2>
 
                     <p className="text-slate-500 text-sm">
-                      Create professional course information.
+                      {editId ? "Update existing course information." : "Create professional course information."}
                     </p>
                   </div>
                 </div>
@@ -335,6 +367,15 @@ export default function AdminPanel() {
                               {(pdfFile.size / 1024 / 1024).toFixed(2)} MB · Click to change
                             </span>
                           </>
+                        ) : course.pdfUrl ? (
+                          <>
+                            <span className="block text-slate-800 font-semibold text-sm">
+                              Existing PDF: {course.pdfUrl.split('/').pop()}
+                            </span>
+                            <span className="block text-slate-400 text-xs mt-0.5">
+                              Click to upload a new PDF to replace the existing one
+                            </span>
+                          </>
                         ) : (
                           <>
                             <span className="block text-slate-500 font-medium text-sm">Click to upload a PDF file</span>
@@ -361,13 +402,31 @@ export default function AdminPanel() {
                   </div>
                 </div>
 
-                <button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="w-full bg-gradient-to-r from-[#0c4563] to-[#1d7ea8] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
-                >
-                  {saving ? "Saving Course..." : "Save Course"}
-                </button>
+                <div className="flex gap-4">
+                  <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="flex-1 bg-gradient-to-r from-[#0c4563] to-[#1d7ea8] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+                  >
+                    {saving ? (editId ? "Updating..." : "Saving...") : (editId ? "Update Course" : "Save Course")}
+                  </button>
+                  
+                  {editId && (
+                    <button
+                      onClick={() => {
+                        setEditId(null);
+                        setCourse({
+                          title: "", duration: "", fees: "", schedule: "", timing: "",
+                          description: "", eligibility: "", training: "", tagLine: "", payment: "", pdfUrl: ""
+                        });
+                        setPdfFile(null);
+                      }}
+                      className="px-6 bg-slate-100 text-slate-600 py-3 rounded-xl font-semibold hover:bg-slate-200 transition-all"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </div>
 
               </div>
             </div>
@@ -450,14 +509,24 @@ export default function AdminPanel() {
                             </div>
                           </div>
 
-                          <button
-                            onClick={() =>
-                              handleDelete(c._id)
-                            }
-                            className="text-red-500 opacity-0 group-hover:opacity-100 transition"
-                          >
-                            <Trash2 size={18} />
-                          </button>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleEdit(c)}
+                              className="text-blue-500   transition"
+                              title="Edit"
+                            >
+                              <Edit2 size={18} />
+                            </button>
+                            <button
+                              onClick={() =>
+                                handleDelete(c._id)
+                              }
+                              className="text-red-500   transition"
+                              title="Delete"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
 
                         </div>
                       </div>
