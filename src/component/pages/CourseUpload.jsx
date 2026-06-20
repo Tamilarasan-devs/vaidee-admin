@@ -26,9 +26,11 @@ export default function AdminPanel() {
     tagLine: "",
     payment: "",
     pdfUrl: "",
+    thumbnailUrl: "",
   });
 
   const [pdfFile, setPdfFile] = useState(null);
+  const [thumbnailFile, setThumbnailFile] = useState(null);
   const [courses, setCourses] = useState([]);
   const [search, setSearch] = useState("");
   const [saving, setSaving] = useState(false);
@@ -67,6 +69,9 @@ export default function AdminPanel() {
       if (pdfFile) {
         formData.append("pdf", pdfFile);
       }
+      if (thumbnailFile) {
+        formData.append("thumbnail", thumbnailFile);
+      }
 
       if (editId) {
         await axios.put(`${BASE_URL}/api/courses/${editId}`, formData, {
@@ -93,10 +98,14 @@ export default function AdminPanel() {
         tagLine: "",
         payment: "",
         pdfUrl: "",
+        thumbnailUrl: "",
       });
       setPdfFile(null);
+      setThumbnailFile(null);
       const fileInput = document.getElementById("course-pdf-input");
       if (fileInput) fileInput.value = "";
+      const thumbnailInput = document.getElementById("course-thumbnail-input");
+      if (thumbnailInput) thumbnailInput.value = "";
 
       fetchCourses();
     } catch (error) {
@@ -138,10 +147,14 @@ export default function AdminPanel() {
       tagLine: c.tagLine || "",
       payment: c.payment || "",
       pdfUrl: c.pdfUrl || "",
+      thumbnailUrl: c.thumbnailUrl || "",
     });
     setPdfFile(null);
+    setThumbnailFile(null);
     const fileInput = document.getElementById("course-pdf-input");
     if (fileInput) fileInput.value = "";
+    const thumbnailInput = document.getElementById("course-thumbnail-input");
+    if (thumbnailInput) thumbnailInput.value = "";
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -402,6 +415,71 @@ export default function AdminPanel() {
                   </div>
                 </div>
 
+                {/* THUMBNAIL UPLOAD */}
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-4">
+                    Course Thumbnail (Image)
+                  </h3>
+
+                  <div className="relative">
+                    <input
+                      id="course-thumbnail-input"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setThumbnailFile(e.target.files[0] || null)}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => document.getElementById("course-thumbnail-input").click()}
+                      className="w-full flex items-center gap-4 p-4 border-2 border-dashed border-slate-300 rounded-2xl hover:border-[#0c4563] hover:bg-[#0c4563]/5 transition-all cursor-pointer group"
+                    >
+                      <span className="flex items-center justify-center w-12 h-12 bg-[#0c4563]/10 rounded-xl text-[#0c4563] group-hover:bg-[#0c4563]/20 transition-colors">
+                        <FileText size={22} />
+                      </span>
+                      <span className="text-left flex-1">
+                        {thumbnailFile ? (
+                          <>
+                            <span className="block text-slate-800 font-semibold text-sm">{thumbnailFile.name}</span>
+                            <span className="block text-slate-400 text-xs mt-0.5">
+                              {(thumbnailFile.size / 1024 / 1024).toFixed(2)} MB · Click to change
+                            </span>
+                          </>
+                        ) : course.thumbnailUrl ? (
+                          <>
+                            <span className="block text-slate-800 font-semibold text-sm">
+                              Existing Thumbnail: {course.thumbnailUrl.split('/').pop()}
+                            </span>
+                            <span className="block text-slate-400 text-xs mt-0.5">
+                              Click to upload a new thumbnail to replace the existing one
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="block text-slate-500 font-medium text-sm">Click to upload an image</span>
+                            <span className="block text-slate-400 text-xs mt-0.5">
+                              Thumbnail for the home page (optional)
+                            </span>
+                          </>
+                        )}
+                      </span>
+                      {thumbnailFile && (
+                        <span
+                          className="text-xs text-red-500 hover:text-red-700 font-semibold px-3 py-1.5 rounded-lg hover:bg-red-50 transition-all border border-transparent hover:border-red-200"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setThumbnailFile(null);
+                            const fileInput = document.getElementById("course-thumbnail-input");
+                            if (fileInput) fileInput.value = "";
+                          }}
+                        >
+                          Remove
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
                 <div className="flex gap-4">
                   <button
                     onClick={handleSave}
@@ -417,9 +495,10 @@ export default function AdminPanel() {
                         setEditId(null);
                         setCourse({
                           title: "", duration: "", fees: "", schedule: "", timing: "",
-                          description: "", eligibility: "", training: "", tagLine: "", payment: "", pdfUrl: ""
+                          description: "", eligibility: "", training: "", tagLine: "", payment: "", pdfUrl: "", thumbnailUrl: ""
                         });
                         setPdfFile(null);
+                        setThumbnailFile(null);
                       }}
                       className="px-6 bg-slate-100 text-slate-600 py-3 rounded-xl font-semibold hover:bg-slate-200 transition-all"
                     >
