@@ -80,57 +80,46 @@ export default function Admissions() {
           <p className="text-slate-400">No admissions found yet.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[800px] text-sm text-left">
-              <thead>
-                <tr className="text-[11px] text-slate-400 font-bold uppercase tracking-widest bg-slate-50/70 border-b border-slate-100">
-                  <th className="px-6 py-4">Student</th>
-                  <th className="px-6 py-4">Course</th>
-                  <th className="px-6 py-4">Batch/Date</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {admissions.map((adm) => (
-                  <tr key={adm._id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="px-6 py-4">
-                      <div>
-                        <p className="font-semibold text-slate-800">{adm.fullName}</p>
-                        <p className="text-xs text-slate-400">{adm.phone}</p>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-slate-700 font-medium">{adm.courseName}</span>
-                        <span className="text-[10px] text-slate-400 uppercase tracking-tighter">Paid: ₹{adm.advancePaid}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-slate-600">{adm.batch}</span>
-                        <span className="text-[11px] text-slate-400">{new Date(adm.createdAt).toLocaleDateString()}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${getStatusColor(adm.status)}`}>
-                        {adm.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <button 
-                        onClick={() => setSelectedAdmission(adm)}
-                        className="text-violet-600 hover:text-violet-700 font-semibold text-xs bg-violet-50 px-3 py-1.5 rounded-lg transition-colors"
-                      >
-                        View Details
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {admissions.map((adm) => (
+            <div key={adm._id} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col gap-4 hover:shadow-md hover:border-slate-200 transition-all">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="font-bold text-slate-800 text-lg leading-tight mb-1">{adm.fullName}</h3>
+                  <p className="text-xs text-slate-400 flex items-center gap-1">📞 {adm.phone}</p>
+                </div>
+                <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${getStatusColor(adm.status)}`}>
+                  {adm.status}
+                </span>
+              </div>
+              
+              <div className="bg-slate-50/80 rounded-xl p-4 flex flex-col gap-3 border border-slate-50">
+                <div>
+                  <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-0.5">Course Enrolled</p>
+                  <p className="text-sm text-slate-700 font-semibold">{adm.courseName}</p>
+                </div>
+                <div className="flex justify-between items-end">
+                  <div>
+                    <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-0.5">Date</p>
+                    <p className="text-xs text-slate-600">{new Date(adm.createdAt).toLocaleDateString()}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-0.5">Advance Paid</p>
+                    <p className="text-sm text-[#0c4563] font-bold">₹{adm.advancePaid}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-auto pt-2 flex justify-end">
+                <button 
+                  onClick={() => setSelectedAdmission(adm)}
+                  className="w-full text-[#0c4563] hover:text-white font-semibold text-sm bg-[#0c4563]/10 hover:bg-[#0c4563] px-4 py-2.5 rounded-xl transition-colors text-center"
+                >
+                  Review Application
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
@@ -156,33 +145,21 @@ export default function Admissions() {
                 {/* Personal */}
                 <Section title="Personal Information">
                   <InfoItem label="Full Name" value={selectedAdmission.fullName} />
-                  <InfoItem label="Father/Husband" value={selectedAdmission.fatherName} />
-                  <InfoItem label="DOB" value={selectedAdmission.dob} />
                   <InfoItem label="Gender" value={selectedAdmission.gender} />
                 </Section>
 
                 {/* Contact */}
                 <Section title="Contact Details">
                   <InfoItem label="Phone" value={selectedAdmission.phone} />
-                  <InfoItem label="WhatsApp" value={selectedAdmission.whatsapp} />
                   <InfoItem label="Email" value={selectedAdmission.email} />
-                  <InfoItem label="City" value={selectedAdmission.city} />
-                  <InfoItem label="Pincode" value={selectedAdmission.pincode} />
                 </Section>
 
                 {/* Course */}
                 <Section title="Course Details">
                   <InfoItem label="Course" value={selectedAdmission.courseName} />
-                  <InfoItem label="Batch" value={selectedAdmission.batch} />
                   <InfoItem label="Joining Date" value={selectedAdmission.joiningDate} />
                   <InfoItem label="Total Fees" value={`₹${selectedAdmission.totalFees}`} />
                   <InfoItem label="Advance Paid" value={`₹${selectedAdmission.advancePaid}`} />
-                </Section>
-
-                {/* Education */}
-                <Section title="Educational Details">
-                  <InfoItem label="Highest Qual." value={selectedAdmission.qualification} />
-                  <InfoItem label="College/School" value={selectedAdmission.college} />
                 </Section>
 
                 {/* Payment Screenshot */}
@@ -191,10 +168,10 @@ export default function Admissions() {
                     <Section title="Payment Screenshot">
                       <div 
                         className="rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity"
-                        onClick={() => window.open(`${BASE_URL}/uploads/admissions/${selectedAdmission.paymentScreenshot}`, '_blank')}
+                        onClick={() => window.open(selectedAdmission.paymentScreenshot.startsWith('http') ? selectedAdmission.paymentScreenshot : `${BASE_URL}/uploads/admissions/${selectedAdmission.paymentScreenshot}`, '_blank')}
                       >
                         <img 
-                          src={`${BASE_URL}/uploads/admissions/${selectedAdmission.paymentScreenshot}`} 
+                          src={selectedAdmission.paymentScreenshot.startsWith('http') ? selectedAdmission.paymentScreenshot : `${BASE_URL}/uploads/admissions/${selectedAdmission.paymentScreenshot}`} 
                           alt="Payment Screenshot"
                           className="max-h-48 w-full object-contain"
                         />
@@ -203,15 +180,6 @@ export default function Admissions() {
                     </Section>
                   </div>
                 )}
-
-                {/* Address */}
-                <div className="md:col-span-2">
-                  <Section title="Full Address">
-                    <p className="text-sm text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100 leading-relaxed">
-                      {selectedAdmission.address}
-                    </p>
-                  </Section>
-                </div>
 
                 {/* Actions */}
                 <Section title="Management Actions">
